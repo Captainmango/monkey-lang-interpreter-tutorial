@@ -1,5 +1,8 @@
 package ast
-
+/*
+How the language works. AST Nodes make up expressions and statements in the programming language
+This will be turned into executable instructions
+*/
 import (
 	"bytes"
 

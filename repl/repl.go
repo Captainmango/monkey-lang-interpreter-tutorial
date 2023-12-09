@@ -1,5 +1,12 @@
 package repl
 
+/*
+The repl takes in a line of input and passes it through the lexer to produce the AST
+
+Doesn't do much right now, but will eventually take the AST and turn it into instructions
+that can be executed.
+*/
+
 import (
 	"bufio"
 	"fmt"

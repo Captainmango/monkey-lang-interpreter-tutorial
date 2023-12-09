@@ -1,5 +1,9 @@
 package parser
 
+/*
+Takes tokens and turns them into expressions
+*/
+
 import (
 	"fmt"
 	"strconv"
@@ -9,6 +13,7 @@ import (
 	"github.com/Captainmango/monkey/token"
 )
 
+// precedence of operations. Func calls are the highest. Lowest is for expressions
 const (
 	_ int = iota
 	LOWEST
@@ -20,6 +25,7 @@ const (
 	CALL
 )
 
+// Linking precedence to specific tokens
 var precedences = map[token.TokenType]int{
 	token.EQ: EQUALS,
 	token.NOT_EQ: EQUALS,
@@ -32,7 +38,10 @@ var precedences = map[token.TokenType]int{
 }
 
 type (
+	// add(2,6)
 	prefixParseFn func() ast.Expression
+
+	// 2 + 6
 	infixParseFn func(ast.Expression) ast.Expression
 )
 
@@ -45,6 +54,8 @@ type Parser struct {
 	infixParseFns map[token.TokenType]infixParseFn
 }
 
+// creates a new Parser. Parsers create a program which is a list of statements
+// Statments are combinations of Expressions which are combinations of tokens that can be evaluated
 func New (l *lexer.Lexer) *Parser {
 	p := &Parser{
 		l: l,

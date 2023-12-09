@@ -1,5 +1,8 @@
 package lexer
-
+/*
+Takes input as plain text and turns it into a list of tokens. Used by the Parser
+to produce the AST
+*/
 import (
 	"github.com/Captainmango/monkey/token"
 )

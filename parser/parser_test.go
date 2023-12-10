@@ -178,7 +178,7 @@ func TestParsingInfixExpressions(t *testing.T) {
 	for _, tt := range infixTests {
 		l := lexer.New(tt.input)
 		p := New(l)
-		
+
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 		stmt, _ := assertProgram(t, *program)
@@ -259,6 +259,34 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 	}
 }
 
+func TestBooleanExpression(t *testing.T) {
+	tests := []struct{
+		input string
+		expected bool
+	} {
+		{
+			"true;",
+			true,
+		},
+		{
+			"false;",
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		stmt, _ := assertProgram(t, *program)
+		exp, _ := stmt.Expression.(*ast.Boolean)
+
+		assertLiteralExpression(t, exp, tt.expected)
+	}
+}
+
 func assertProgram(t *testing.T, p ast.Program) (*ast.ExpressionStatement, bool) {
 	if len(p.Statements) != 1 {
 		t.Fatalf("program has not enough statements. got=%d", len(p.Statements))
@@ -314,6 +342,22 @@ func assertIdentifier(t *testing.T, exp ast.Expression, value string) bool {
 	return true
 }
 
+func assertBoolean(t *testing.T, exp ast.Expression, value bool) bool {
+	b, ok := exp.(*ast.Boolean)
+
+	if !ok {
+		t.Errorf("exp not *ast.Boolean. got=%T", exp)
+		return false
+	}
+
+	if b.Value != value {
+		t.Errorf("b.Value not %v. got=%v", value, b.Value)
+		return false
+	}
+
+	return true
+}
+
 func assertLiteralExpression(
 	t *testing.T,
 	exp ast.Expression,
@@ -326,6 +370,8 @@ func assertLiteralExpression(
 		return assertIntegerLiteral(t, exp, v)
 	case string:
 		return assertIdentifier(t, exp, v)
+	case bool:
+		return assertBoolean(t, exp, v)
 	}
 
 	t.Errorf("type of exp not handled. got=%T", exp)

@@ -129,10 +129,12 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []struct {
 		input string
 		operator string
-		integerValue int64
+		value any
 	}{
 		{"!5;", "!", 5},
 		{"-15;", "-", 15},
+		{"!true;", "!", true},
+		{"!false;", "!", false},
 	}
 	for _, tt := range prefixTests {
 		l := lexer.New(tt.input)
@@ -152,7 +154,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 			tt.operator, exp.Operator)
 		}
 	
-		if !assertLiteralExpression(t, exp.Right, tt.integerValue) {
+		if !assertLiteralExpression(t, exp.Right, tt.value) {
 			return
 		}
 	}
@@ -161,9 +163,9 @@ func TestParsingPrefixExpressions(t *testing.T) {
 func TestParsingInfixExpressions(t *testing.T) {
 	infixTests := []struct {
 		input string
-		leftValue int64
+		leftValue any
 		operator string
-		rightValue int64
+		rightValue any
 	}{
 		{"5 + 5;", 5, "+", 5},
 		{"5 - 5;", 5, "-", 5},
@@ -173,6 +175,9 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"5 < 5;", 5, "<", 5},
 		{"5 == 5;", 5, "==", 5},
 		{"5 != 5;", 5, "!=", 5},
+		{"true == true", true, "==", true},
+		{"true != false", true, "!=", false},
+		{"false == false", false, "==", false},
 	}
 	
 	for _, tt := range infixTests {
@@ -354,7 +359,7 @@ func assertIdentifier(t *testing.T, exp ast.Expression, value string) bool {
 	return true
 }
 
-func assertBoolean(t *testing.T, exp ast.Expression, value bool) bool {
+func assertBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
 	b, ok := exp.(*ast.Boolean)
 
 	if !ok {
@@ -364,6 +369,11 @@ func assertBoolean(t *testing.T, exp ast.Expression, value bool) bool {
 
 	if b.Value != value {
 		t.Errorf("b.Value not %v. got=%v", value, b.Value)
+		return false
+	}
+
+	if b.TokenLiteral() != fmt.Sprintf("%t", value) {
+		t.Errorf("bo.TokenLiteral not %t. got=%s", value, b.TokenLiteral())
 		return false
 	}
 
@@ -383,15 +393,20 @@ func assertLiteralExpression(
 	case string:
 		return assertIdentifier(t, exp, v)
 	case bool:
-		return assertBoolean(t, exp, v)
+		return assertBooleanLiteral(t, exp, v)
 	}
 
 	t.Errorf("type of exp not handled. got=%T", exp)
 	return false
 }
 
-func assertInfixExpression(t *testing.T, exp ast.Expression, left interface{},
-	operator string, right interface{}) bool {
+func assertInfixExpression(
+	t *testing.T, 
+	exp ast.Expression, 
+	left any, 
+	operator string, 
+	right any,
+) bool {
 	opExp, ok := exp.(*ast.InfixExpression)
 	if !ok {
 	t.Errorf("exp is not ast.OperatorExpression. got=%T(%s)", exp, exp)

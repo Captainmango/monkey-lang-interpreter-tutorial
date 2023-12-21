@@ -146,13 +146,16 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	create name node
 	*/
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-	// peak assign (checking correct order of tokens)
+	
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
 
-	// @TODO: Sort out expressions (read to SEMICOLON)
-	for !p.curTokenIs(token.SEMICOLON) {
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	for p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -164,7 +167,9 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	p.nextToken()
 
-	for !p.curTokenIs(token.SEMICOLON) {
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+
+	for p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 

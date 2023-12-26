@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/Captainmango/monkey/evaluator"
 	"github.com/Captainmango/monkey/lexer"
 	"github.com/Captainmango/monkey/parser"
 )
@@ -43,8 +44,12 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		evaluatedProgram := evaluator.Eval(program)
+
+		if evaluatedProgram != nil {
+			io.WriteString(out, evaluatedProgram.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 

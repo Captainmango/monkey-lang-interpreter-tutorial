@@ -308,8 +308,20 @@ func TestFunctionApplication(t *testing.T) {
 		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
 		{"fn(x) { x; }(5)", 5},
 	}
-	
+
 	for _, tt := range tests {
 		testIntegerObj(t, testEval(tt.input), tt.expected)
 	}
+}
+
+func TestClosures(t *testing.T) {
+	input := `
+	let newAdder = fn(x) {
+		fn(y) { x + y };
+	};
+	
+	let addTwo = newAdder(2);
+	addTwo(2);`
+
+	testIntegerObj(t, testEval(input), 4)
 }

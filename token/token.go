@@ -17,7 +17,6 @@ const (
 	EOF = "EOF"
 
 	// Identifiers + literals
-
 	IDENT = "IDENT" // add, foobar, x, y, ...
 	INT = "INT" // 1343456
 
@@ -49,6 +48,9 @@ const (
 	IF = "IF"
 	ELSE = "ELSE"
 	RETURN = "RETURN"
+
+	//Data types
+	STRING = "STRING"
 )
 
 type Token struct {

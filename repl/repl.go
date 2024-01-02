@@ -14,6 +14,7 @@ import (
 
 	"github.com/Captainmango/monkey/evaluator"
 	"github.com/Captainmango/monkey/lexer"
+	"github.com/Captainmango/monkey/object"
 	"github.com/Captainmango/monkey/parser"
 )
 
@@ -43,7 +44,9 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluatedProgram := evaluator.Eval(program)
+		env := object.NewEnvironment()
+
+		evaluatedProgram := evaluator.Eval(program, env)
 
 		if evaluatedProgram != nil {
 			io.WriteString(out, evaluatedProgram.Inspect())

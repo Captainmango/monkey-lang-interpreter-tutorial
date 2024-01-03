@@ -23,6 +23,8 @@ const PROMPT = ">> "
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
+	env := object.NewEnvironment()
+
 	for {
 		fmt.Println(PROMPT)
 		
@@ -43,8 +45,6 @@ func Start(in io.Reader, out io.Writer) {
 			printParserErrors(out, p.Errors())
 			continue
 		}
-
-		env := object.NewEnvironment()
 
 		evaluatedProgram := evaluator.Eval(program, env)
 
